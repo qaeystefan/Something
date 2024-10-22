@@ -19,6 +19,7 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     // Parse the incoming message
     const messageData = JSON.parse(message);
+    console.log('Received message data:', messageData); // Log the received message data
   
     // Insert the new message into the database
     insertMessage(messageData.nickname, messageData.content, new Date().toISOString(), (err, insertedMessage) => {
