@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const setNicknameButton = document.getElementById('ok');
     const nicknameContainer = document.getElementById('nickname-container');
     const chatContainer = document.getElementById('chat-container');
-
+    const topicContainer = document.getElementById('topic');
+    const dbbutton = document.getElementById('clear-db');   
     // Create a virtual form and append the message input to it
     const virtualForm = document.createElement('form');
     virtualForm.appendChild(messageInput);
@@ -69,9 +70,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nickname) {
         nicknameContainer.style.display = 'none';
         chatContainer.style.display = 'block';
+        topicContainer.style.display = 'block';
+        messageInput.style.display = 'block';
+        dbbutton.style.display = 'block';
     } else {
         nicknameContainer.style.display = 'block';
         chatContainer.style.display = 'none';
+        topicContainer.style.display = 'none';
+        messageInput.style.display = 'none';
+        dbbutton.style.display = 'none';
         nicknameInput.focus();
     }
 
@@ -83,6 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
             nicknameContainer.style.display = 'none'; // Hide nickname input
             chatContainer.style.display = 'block'; // Show chat container
             messageInput.focus(); // Focus on the message input
+            dbbutton.style.display = 'block';
+            messageInput.style.display = 'block';
+            topicContainer.style.display = 'block';
         }
     }
 
@@ -98,26 +108,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Append messages to the chat
-    function appendMessage(messageData) {
-        // Check if messageData has the required properties
-        if (messageData && messageData.nickname && messageData.content && messageData.timestamp) {
-            // Create a new div element for each message
-            const messageElement = document.createElement('div');
-            // Format the timestamp
-            const timestamp = new Date(messageData.timestamp);
-            const formattedTimestamp = isNaN(timestamp.getTime()) ? 'Invalid timestamp' : timestamp.toLocaleString();
-            // Format the message
-            const formattedMessage = `${messageData.nickname}: ${messageData.content} (${formattedTimestamp})`;
-            messageElement.textContent = formattedMessage;
-            messagesDiv.appendChild(messageElement);
-            // Scroll to the last message
-            messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        } else {
-            console.error('Invalid message data:', messageData);
-        }
+function appendMessage(messageData) {
+    // Check if messageData has the required properties
+    if (messageData && messageData.nickname && messageData.content && messageData.timestamp) {
+        // Create a new div element for each message
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message'; // Add a class for styling
+
+        // Create a span for the message text
+        const messageTextSpan = document.createElement('span');
+        messageTextSpan.className = 'message-text';
+        messageTextSpan.textContent = `${messageData.nickname}: ${messageData.content}`;
+
+        // Create a span for the timestamp
+        const timestampSpan = document.createElement('span');
+        timestampSpan.className = 'message-timestamp';
+
+        // Format the timestamp
+        const timestamp = new Date(messageData.timestamp);
+        const timeString = isNaN(timestamp.getTime()) ? 'Invalid timestamp' : timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        const fullTimestamp = isNaN(timestamp.getTime()) ? 'Invalid timestamp' : timestamp.toLocaleString();
+
+        // Set the time and full timestamp
+        timestampSpan.textContent = timeString;
+        timestampSpan.title = fullTimestamp; // The full timestamp will be shown on hover
+
+        // Append the message text and timestamp to the message element
+        messageElement.appendChild(messageTextSpan);
+        messageElement.appendChild(timestampSpan);
+
+        // Append the message element to the messages container
+        messagesDiv.appendChild(messageElement);
+
+        // Scroll to the last message
+        messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+        console.error('Invalid message data:', messageData);
     }
-    
-// Modify the processMessageData function to handle history type correctly
+}
 
 // Modify the processMessageData function to handle history type correctly
 function processMessageData(data) {

@@ -16,6 +16,13 @@ db.run(`CREATE TABLE IF NOT EXISTS messages (
   timestamp TEXT NOT NULL
 )`);
 
+// Create a table to store messages
+db.run(`CREATE TABLE IF NOT EXISTS topics (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nickname TEXT NOT NULL,
+  content TEXT NOT NULL,
+  timestamp TEXT NOT NULL
+)`);
 // Modify the insertMessage function to accept a callback
 function insertMessage(nickname, content, timestamp, callback) {
     const sql = `INSERT INTO messages (nickname, content, timestamp) VALUES (?, ?, ?)`;

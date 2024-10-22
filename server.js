@@ -2,7 +2,7 @@
 const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
-const { insertMessage, getMessageHistory } = require('./database'); // Include the database module
+const { insertMessage, getMessageHistory, clearDatabase } = require('./database'); // Include the database module
 
 const app = express();
 const server = http.createServer(app);
@@ -39,6 +39,18 @@ wss.on('connection', (ws) => {
   });
 });
 
+
+app.post('/clear-database', (req, res) => {
+  clearDatabase((err) => {
+    if (err) {
+      console.error('Error clearing database:', err);
+      res.status(500).send('Error clearing database');
+    } else {
+      console.log('Database cleared successfully');
+      res.status(200).send('Database cleared');
+    }
+  });
+});
 server.listen(3000, () => {
   console.log('Server is listening on http://localhost:3000');
 });
