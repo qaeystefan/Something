@@ -1,14 +1,16 @@
-// server.js
 const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
-const { insertMessage, getMessageHistory, clearDatabase } = require('./database'); // Include the database module
+const cors = require('cors'); // Import the cors middleware
+const { insertMessage, getMessageHistory, clearDatabase, insertTopic, updateTopic } = require('./database'); // Include the database module
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+app.use(cors()); // Use the cors middleware
 app.use(express.static('public')); // Serve static files from the 'public' folder
+app.use(express.json()); // Add this line to parse JSON bodies
 
 wss.on('connection', (ws) => {
   // Send the message history to the newly connected client
@@ -22,7 +24,7 @@ wss.on('connection', (ws) => {
     console.log('Received message data:', messageData); // Log the received message data
   
     // Insert the new message into the database
-    insertMessage(messageData.nickname, messageData.content, new Date().toISOString(), (err, insertedMessage) => {
+    insertMessage(messageData.nickname, messageData.content, (err, insertedMessage) => {
       if (err) {
           console.error('Error inserting message:', err);
       } else {
@@ -39,7 +41,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-
 app.post('/clear-database', (req, res) => {
   clearDatabase((err) => {
     if (err) {
@@ -51,6 +52,36 @@ app.post('/clear-database', (req, res) => {
     }
   });
 });
+
+// Endpoint to create a topic
+app.post('/create-topic', (req, res) => {
+  const { topicTitle, creatorNickname } = req.body;
+  insertTopic(topicTitle, creatorNickname, (err, topic) => {
+    if (err) {
+      console.error('Error creating topic:', err);
+      res.status(500).send('Error creating topic');
+    } else {
+      console.log('Topic created successfully:', topic);
+      res.status(201).json(topic);
+    }
+  });
+});
+
+// Endpoint to update a topic
+app.put('/update-topic/:id', (req, res) => {
+  const { id } = req.params;
+  const { topicTitle, creatorNickname } = req.body;
+  updateTopic(id, topicTitle, creatorNickname, (err, topic) => {
+    if (err) {
+      console.error('Error updating topic:', err);
+      res.status(500).send(err.message);
+    } else {
+      console.log('Topic updated successfully:', topic);
+      res.status(200).json(topic);
+    }
+  });
+});
+
 server.listen(3000, () => {
   console.log('Server is listening on http://localhost:3000');
 });

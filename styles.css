@@ -18,11 +18,9 @@ body {
 }
 
 button {
-
     color: #000000;
     background-color: none;
-    border:none
-    
+    border: none;
 }
 
 h1 {
@@ -34,8 +32,9 @@ h1 {
 
 .logo {
     filter: drop-shadow(0 0 0.75rem #ebd234);
-    margin-left: 2px
+    margin-left: 2px;
 }
+
 #messages {
     width: 800px;
     max-width: 800px;
@@ -57,6 +56,7 @@ h1 {
     border-radius: 6px;
     margin-right: 10px;
 }
+
 #topic #topicTitle {
     width: 800px;
     max-width: 800px;
@@ -148,12 +148,19 @@ h1 {
     border-radius: 15px;
     box-shadow: 0 9px #999;
     visibility: hidden;
-  }
-  
-  #ok:hover {background-color: #e2c64a46}
-  
-  #ok:active {
+}
+
+#ok:hover {
+    background-color: #e2c64a46;
+}
+
+#ok:active {
     background-color: #e2c64ad8;
     box-shadow: 0 2px #666;
     transform: translateY(4px);
-  }
+}
+
+/* Highlight nicknames from the user */
+.highlight-nickname {
+    color: #e2c64a; /* Highlight color */
+}
