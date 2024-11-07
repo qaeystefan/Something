@@ -8,11 +8,25 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+let onlineUsers = 0;
+
+function broadcastOnlineUsers() {
+  const message = JSON.stringify({ type: 'onlineUsers', data: onlineUsers });
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+}
+
 app.use(cors()); // Use the cors middleware
 app.use(express.static('public')); // Serve static files from the 'public' folder
 app.use(express.json()); // Add this line to parse JSON bodies
 
 wss.on('connection', (ws) => {
+  onlineUsers++;
+  broadcastOnlineUsers();
+
   // Send the message history to the newly connected client
   getMessageHistory((messages) => {
     ws.send(JSON.stringify({ type: 'history', data: messages }));
@@ -39,6 +53,11 @@ wss.on('connection', (ws) => {
       }
     });
   });
+
+  ws.on('close', () => {
+    onlineUsers--;
+    broadcastOnlineUsers();
+  });
 });
 
 app.post('/clear-database', (req, res) => {
@@ -49,9 +68,18 @@ app.post('/clear-database', (req, res) => {
     } else {
       console.log('Database cleared successfully');
       res.status(200).send('Database cleared');
+
+      // Broadcast a message to all clients to refresh their chat boxes
+      const message = JSON.stringify({ type: 'refreshChat' });
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      });
     }
   });
 });
+
 
 // Endpoint to create a topic
 app.post('/create-topic', (req, res) => {

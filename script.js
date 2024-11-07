@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatContainer = document.getElementById('chat-container');
     const topicContainer = document.getElementById('topic');
     const clearButton = document.getElementById('clearButton'); // Add this line
+    const onlineUsersDiv = document.getElementById('online-users'); // Add this line
 
     // Initialize WebSocket connection
     const socket = new WebSocket('ws://localhost:3000');
@@ -35,21 +36,28 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
 
-    // Display the appropriate UI based on nickname presence
-    const nickname = getCookie('nickname');
-    if (nickname) {
-        nicknameContainer.style.display = 'none';
-        chatContainer.style.display = 'block';
-        topicContainer.style.display = 'block';
-        messageInput.style.display = 'block';
-        clearButton.style.display = 'block'; // Add this line
-    } else {
-        nicknameContainer.style.display = 'block';
-        chatContainer.style.display = 'none';
-        topicContainer.style.display = 'none';
-        messageInput.style.display = 'none';
-        clearButton.style.display = 'none'; // Add this line
-        nicknameInput.focus();
+    // Function to update the UI based on the nickname
+    function updateUIBasedOnNickname() {
+        const nickname = getCookie('nickname');
+        if (nickname) {
+            nicknameContainer.style.display = 'none';
+            chatContainer.style.display = 'block';
+            topicContainer.style.display = 'block';
+            messageInput.style.display = 'block';
+            // Check if the nickname contains "*"
+            if (nickname.includes("*")) {
+                clearButton.style.display = 'block'; // Show the clear button
+            } else {
+                clearButton.style.display = 'none'; // Hide the clear button
+            }
+        } else {
+            nicknameContainer.style.display = 'block';
+            chatContainer.style.display = 'none';
+            topicContainer.style.display = 'none';
+            messageInput.style.display = 'none';
+            clearButton.style.display = 'none'; // Add this line
+            nicknameInput.focus();
+        }
     }
 
     // Set nickname and update UI
@@ -57,12 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nickname = nicknameInput.value.trim();
         if (nickname) {
             setCookie('nickname', nickname, 7);
-            nicknameContainer.style.display = 'none'; // Hide nickname input
-            chatContainer.style.display = 'block'; // Show chat container
-            messageInput.focus(); // Focus on the message input
-            clearButton.style.display = 'block'; // Add this line
-            messageInput.style.display = 'block';
-            topicContainer.style.display = 'block';
+            updateUIBasedOnNickname(); // Update the UI based on the nickname
         }
     }
 
@@ -76,6 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
             setNickname();
         }
     });
+
+    // Call the function to update the UI based on the nickname when the page loads
+    updateUIBasedOnNickname();
 
     // Append messages to the chat
     function appendMessage(messageData) {
@@ -141,6 +147,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (data.type === 'message') {
             // Append the new message
             appendMessage(data.data); // data.data should be the individual message object
+        } else if (data.type === 'onlineUsers') { // Add this block
+            onlineUsersDiv.textContent = `Online users: ${data.data}`;
+        } else if (data.type === 'refreshChat') { // Add this block
+            messagesDiv.innerHTML = ''; // Clear the chat display
         }
     }
 
@@ -198,4 +208,14 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Error clearing database:', error));
     });
+
+    // Generate more stars dynamically
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.animationDuration = Math.random() * 5 + 3 + 's';
+        document.querySelector('.background').appendChild(star);
+    }
 });

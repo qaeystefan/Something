@@ -15,6 +15,42 @@ body {
     justify-content: center;
     height: 100vh;
     padding: 20px;
+    overflow: hidden; /* Prevent scrollbars */
+    position: relative;
+}
+
+.background {
+    /* position: absolute; */
+    /* top: 0;
+    left: 0; */
+    /* width: 100%;
+    height: 100%; */
+    z-index: 0; /* Ensure background is behind other elements */
+}
+
+.star {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: #e2c64a;
+    border-radius: 50%;
+    animation: fly 5s linear infinite;
+}
+
+@keyframes fly {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100vw);
+        opacity: 0;
+    }
+}
+
+.content {
+    position: relative;
+    z-index: 1; /* Ensure content is above the background */
 }
 
 button {
@@ -31,8 +67,8 @@ h1 {
 }
 
 .logo {
-    filter: drop-shadow(0 0 0.75rem #ebd234);
-    margin-left: 2px;
+    filter: drop-shadow(0 0 0.00rem #000000);
+    margin-left: 1px;
 }
 
 #messages {
@@ -163,4 +199,9 @@ h1 {
 /* Highlight nicknames from the user */
 .highlight-nickname {
     color: #e2c64a; /* Highlight color */
+}
+
+#online-users {
+    color:black;
+    font-size: 14px;
 }
